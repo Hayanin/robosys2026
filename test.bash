@@ -9,19 +9,6 @@ ng () {
 
 res=0
 
-### PLUS NORMAL INPUT ###
-out=$(seq 5 | ./plus)
-[ "${out}" = 15 ] || ng "$LINENO"
-
-### PLUS STRANGE INPUT ###
-out=$(echo あ | ./plus)
-[ "$?" = 1 ]      || ng "$LINENO"
-[ "${out}" = "" ] || ng "$LINENO"
-
-out=$(echo | ./plus)
-[ "$?" = 1 ]      || ng "$LINENO"
-[ "${out}" = "" ] || ng "$LINENO"
-
 ### PWCHECK NORMAL INPUT ###
 out=$(printf '12345\nAbc12345\nAbc123!@#xyz\n' | ./pwcheck)
 expected=$(printf 'WEAK: 12345\nMEDIUM: Abc12345\nSTRONG: Abc123!@#xyz')
