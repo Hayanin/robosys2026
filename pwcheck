@@ -3,9 +3,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 import sys
 import re
+import argparse
 
 
-def check_strength(pw):
+def check_strength(pw, min_len):
+    if len(pw) < min_len:
+        return "WEAK"
+
     score = 0
     if len(pw) >= 8:
         score += 1
@@ -27,14 +31,36 @@ def check_strength(pw):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Check password strength from stdin.")
+    parser.add_argument(
+        "-s", "--strong-only",
+        action="store_true",
+        help="Output only STRONG passwords without labels"
+    )
+    parser.add_argument(
+        "-m", "--min-length",
+        type=int,
+        default=1,
+        help="Minimum required password length (default: 1)"
+    )
+    args = parser.parse_args()
+
+    if args.min_length < 1:
+        print("Error: min-length must be at least 1", file=sys.stderr)
+        sys.exit(1)
+
     has_input = False
     for line in sys.stdin:
         pw = line.rstrip("\r\n")
         if not pw:
             continue
         has_input = True
-        level = check_strength(pw)
-        print(f"{level}: {pw}")
+        level = check_strength(pw, args.min_length)
+        if args.strong_only:
+            if level == "STRONG":
+                print(pw)
+        else:
+            print(f"{level}: {pw}")
 
     if not has_input:
         print("Error: empty input", file=sys.stderr)
